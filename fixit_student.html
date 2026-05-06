@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSU FixIt — Housing Maintenance</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gsu-gold: #FFB81C;
+    --gsu-red: #C8102E;
+    --text-dark: #202124;
+    --text-light: #5F6368;
+    --bg-main: #FFFFFF;
+    --bg-alt: #F8F9FA;
+    --border: #DADCE0;
+    --sidebar-width: 260px;
+    --right-panel-width: 320px;
+    --font-main: 'Lexend', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: var(--font-main); background: var(--bg-main); color: var(--text-dark); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+  /* ── LOGIN SEQUENCE ── */
+  .auth-overlay { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+  .auth-card { width: 100%; max-width: 400px; text-align: center; padding: 2rem; }
+  .form-input { width: 100%; padding: 14px 16px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; outline: none; }
+  .form-input:focus { border-color: var(--gsu-gold); }
+  
+  .btn-gold { background: var(--gsu-gold); color: var(--text-dark); border: none; padding: 14px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 1rem; transition: 0.2s; font-family: inherit; }
+  .btn-gold:hover { background: #e5a519; transform: translateY(-1px); }
+  .btn-gold:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .tiger-loading { font-size: 5rem; animation: tigerPulse 2s infinite ease-in-out; }
+  @keyframes tigerPulse {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.15); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: var(--sidebar-width); height: 100vh; background: white; border-right: 1px solid var(--border); position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 2rem 1rem; z-index: 1000; }
+  .sidebar-logo { font-size: 1.5rem; font-weight: 800; margin-bottom: 2.5rem; padding-left: 0.5rem; color: var(--text-dark); }
+  .sidebar-logo span { color: var(--gsu-gold); }
+  .nav-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--text-light); display: flex; align-items: center; gap: 12px; transition: 0.2s; }
+  .nav-item:hover { background: var(--bg-alt); color: var(--text-dark); }
+  .nav-item.active { color: var(--gsu-red); font-weight: 700; background: #FFF1F2; }
+
+  /* ── MAIN ── */
+  .main-wrapper { margin-left: var(--sidebar-width); margin-right: var(--right-panel-width); flex: 1; padding: 3rem; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── CATEGORY GRID ── */
+  .category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .category-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 2rem; transition: 0.2s; cursor: pointer; text-align: center; }
+  .category-card:hover { border-color: var(--gsu-gold); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .category-icon { font-size: 3.5rem; display: block; margin-bottom: 1.5rem; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel { width: var(--right-panel-width); height: 100vh; position: fixed; right: 0; top: 0; background: var(--bg-alt); border-left: 1px solid var(--border); padding: 2rem 1.5rem; overflow-y: auto; }
+  .widget { background: white; border-radius: 12px; border: 1px solid var(--border); padding: 1.25rem; margin-bottom: 1.5rem; }
+  .widget h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 1.25rem; }
+  .news-item { font-size: 0.85rem; margin-bottom: 12px; border-bottom: 1px solid var(--bg-alt); padding-bottom: 8px; }
+  .news-item:last-child { border-bottom: none; }
+  .news-date { color: var(--gsu-red); font-weight: 700; font-size: 0.75rem; }
+  .contact-entry { display: flex; gap: 12px; margin-bottom: 1.25rem; align-items: flex-start; }
+  .contact-entry:last-child { margin-bottom: 0; }
+  .contact-img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: #eee; flex-shrink: 0; }
+  .contact-info h5 { font-size: 0.85rem; font-weight: 700; }
+  .contact-info .contact-role { font-size: 0.7rem; color: var(--text-light); margin-bottom: 2px; }
+  .contact-info .contact-phone { font-size: 0.75rem; color: var(--gsu-gold); font-weight: 600; text-decoration: none; }
+
+  /* ── FORM ── */
+  .form-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem; max-width: 600px; }
+  .form-group { margin-bottom: 1.5rem; }
+  .form-group label { display: block; font-size: 0.75rem; font-weight: 800; color: var(--text-light); margin-bottom: 8px; text-transform: uppercase; }
+  .form-area { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; }
+  .form-area:focus { outline: none; border-color: var(--gsu-gold); }
+
+  /* ── LISTS ── */
+  .list-wrapper { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .list-item { padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .list-item:last-child { border-bottom: none; }
+
+  /* Status badges */
+  .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+  .badge-pending  { background: #FFF8E1; color: #F57F17; }
+  .badge-progress { background: #E3F2FD; color: #1565C0; }
+  .badge-done     { background: #E8F5E9; color: #2E7D32; }
+  .badge-cancel   { background: #FAFAFA; color: #757575; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: #202124; color: white; padding: 14px 24px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; z-index: 9999; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- AUTH STEP 1 -->
+<div id="auth-1" class="auth-overlay">
+  <div class="auth-card">
+    <div style="font-size: 3.5rem; margin-bottom: 1rem;">🐅</div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px;">GSU FixIt</h1>
+    <p style="color: var(--text-light); margin-bottom: 2rem;">Residential Maintenance Portal</p>
+    <button class="btn-gold" onclick="app.toStep2()">Sign in with G-Number</button>
+  </div>
+</div>
+
+<!-- AUTH STEP 2 -->
+<div id="auth-2" class="auth-overlay hidden">
+  <div class="auth-card">
+    <h2 style="margin-bottom: 1.5rem; letter-spacing: -0.5px;">Student Login</h2>
+    <input type="text" id="login-gnum" class="form-input" placeholder="G-Number (e.g. G00123456)">
+    <input type="password" id="login-pass" class="form-input" placeholder="Password">
+    <button class="btn-gold" onclick="app.toStep3()">Sign In →</button>
+    <p style="margin-top: 1.25rem; font-size: 0.85rem; color: var(--text-light); cursor: pointer;" onclick="app.toStep1()">← Back</p>
+  </div>
+</div>
+
+<!-- AUTH STEP 3 (loading) -->
+<div id="auth-3" class="auth-overlay hidden">
+  <div class="tiger-loading">🐅</div>
+  <p style="margin-top: 2rem; font-weight: 600; letter-spacing: 1.5px; color: var(--text-dark);">AUTHENTICATING...</p>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar hidden" id="sidebar">
+  <div class="sidebar-logo">GSU <span>FixIt</span></div>
+  <nav class="nav-group">
+    <div class="nav-item active" onclick="app.showPage('home')" id="nav-home">🏠 New Work Order</div>
+    <div class="nav-item" onclick="app.showPage('active')" id="nav-active">📋 Active Work Orders</div>
+    <div class="nav-item" onclick="app.showPage('history')" id="nav-history">🕐 Repair History</div>
+    <div class="nav-item" onclick="app.showPage('notifications')" id="nav-notifications">🔔 Notifications</div>
+    <div class="nav-item" onclick="app.showPage('room')" id="nav-room">🚪 My Room Info</div>
+  </nav>
+  <div class="nav-item" onclick="location.reload()" style="margin-top: auto; color: var(--gsu-red);">← Logout</div>
+</aside>
+
+<!-- MAIN -->
+<div class="main-wrapper hidden" id="main-ui">
+
+  <!-- PAGE: CATEGORIES -->
+  <section class="page active" id="page-home">
+    <div style="margin-bottom: 2.5rem;">
+      <h1 style="font-size: 2.2rem; letter-spacing: -0.5px;">Submit Work Order</h1>
+      <p style="color: var(--text-light);">Select a category to report a maintenance issue in your residence.</p>
+    </div>
+    <div class="category-grid">
+      <div class="category-card" onclick="app.openForm('Plumbing', '🔧')">
+        <span class="category-icon">🔧</span>
+        <h3>Plumbing</h3>
+        <p>Leaking faucets, toilets, or shower drain issues.</p>
+      </div>
+      <div class="category-card" onclick="app.openForm('Electrical', '⚡')">
+        <span class="category-icon">⚡</span>
+        <h3>Electrical</h3>
+        <p>Outlets not working, flickering lights, or power issues.</p>
+      </div>
+      <div class="category-card" onclick="app.openForm('HVAC / Air', '❄️')">
+        <span class="category-icon">❄️</span>
+        <h3>HVAC / Air</h3>
+        <p>Heating or cooling issues and ventilation problems.</p>
+      </div>
+      <div class="category-card" onclick="app.openForm('Furniture', '🪑')">
+        <span class="category-icon">🪑</span>
+        <h3>Furniture</h3>
+        <p>Issues with bed frames, desks, or closets.</p>
+      </div>
+      <div class="category-card" onclick="app.openForm('Appliances', '🧊')">
+        <span class="category-icon">🧊</span>
+        <h3>Appliances</h3>
+        <p>Refrigerator, microwave, or laundry machine repairs.</p>
+      </div>
+      <div class="category-card" onclick="app.openForm('Pest Control', '🐜')">
+        <span class="category-icon">🐜</span>
+        <h3>Pest Control</h3>
+        <p>Report sightings or request room treatment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: FORM -->
+  <section class="page" id="page-form">
+    <p style="margin-bottom: 1.5rem; color: var(--gsu-gold); font-weight: 700; cursor: pointer;" onclick="app.showPage('home')">← Back to Categories</p>
+    <div class="form-box">
+      <h2 id="form-title">Work Order</h2>
+      <p id="form-subtitle" style="color: var(--text-light); margin-bottom: 2rem;"></p>
+
+      <div class="form-group">
+        <label>Residence Hall</label>
+        <select id="req-dorm" class="form-area">
+          <option value="Hunter Hall">Hunter Hall</option>
+          <option value="Tiger Village A">Tiger Village A</option>
+          <option value="Tiger Village B">Tiger Village B</option>
+          <option value="Robinson Hall">Robinson Hall</option>
+          <option value="Favrot Student Union">Favrot Hall</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Room Number</label>
+        <input type="text" id="req-room" class="form-area" placeholder="e.g. 302">
+      </div>
+
+      <div class="form-group">
+        <label>Issue Description</label>
+        <textarea id="req-desc" class="form-area" style="min-height: 140px;" placeholder="Please describe exactly what needs fixing..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Upload Photo (Optional)</label>
+        <input type="file" id="req-photo" class="form-area" accept="image/*" style="padding: 8px;">
+      </div>
+
+      <div class="form-group">
+        <label>Urgency Level</label>
+        <select id="req-prio" class="form-area">
+          <option value="Low">Routine (3–5 Days)</option>
+          <option value="Medium">Urgent (24 Hours)</option>
+          <option value="High">High Priority (Same Day)</option>
+          <option value="Emergency">Emergency (Immediate)</option>
+        </select>
+      </div>
+
+      <button class="btn-gold" id="submit-btn" onclick="app.submitTicket()">Submit Work Order</button>
+    </div>
+  </section>
+
+  <!-- PAGE: ACTIVE WORK ORDERS -->
+  <section class="page" id="page-active">
+    <h2 style="margin-bottom: 1.5rem;">Active Work Orders</h2>
+    <div class="list-wrapper" id="active-list">
+      <p style="padding:2rem; text-align:center; color:var(--text-light)">Loading...</p>
+    </div>
+  </section>
+
+  <!-- PAGE: HISTORY -->
+  <section class="page" id="page-history">
+    <h2 style="margin-bottom: 1.5rem;">Repair History</h2>
+    <div class="list-wrapper" id="history-list">
+      <p style="padding:2rem; text-align:center; color:var(--text-light)">No completed orders yet.</p>
+    </div>
+  </section>
+
+  <!-- PAGE: NOTIFICATIONS -->
+  <section class="page" id="page-notifications">
+    <h2 style="margin-bottom: 1.5rem;">System Notifications</h2>
+    <div class="list-wrapper">
+      <div class="list-item"><div><b>Housing:</b> Weekly Fire Safety inspection starts Monday.</div></div>
+      <div class="list-item"><div><b>Maintenance:</b> Tiger Village water pressure maintenance completed.</div></div>
+      <div class="list-item"><div><b>Housing:</b> Fall 2026 Housing Application Form Is Live!</div></div>
+      <div class="list-item"><div><b>Accounts:</b> Deadline Extended! All balances must be cleared by 5/6/2026.</div></div>
+      <div class="list-item"><div><b>Student Success Center:</b> All the best on your finals!</div></div>
+    </div>
+  </section>
+
+  <!-- PAGE: MY ROOM INFO -->
+  <section class="page" id="page-room">
+    <h2 style="margin-bottom: 1.5rem;">My Room Info</h2>
+    <div class="form-box">
+      <div class="form-group"><label>Student Name</label><input type="text" class="form-area" value="Methembe Ncube" readonly style="background:var(--bg-alt)"></div>
+      <div class="form-group"><label>Student ID (G#)</label><input type="text" class="form-area" value="G00123456" readonly style="background:var(--bg-alt)"></div>
+      <div class="form-group"><label>Residence Hall</label><input type="text" class="form-area" value="Hunter Hall" readonly style="background:var(--bg-alt)"></div>
+      <div class="form-group"><label>Room Assignment</label><input type="text" class="form-area" value="Room 302" readonly style="background:var(--bg-alt)"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- RIGHT PANEL -->
+<aside class="right-panel hidden" id="right-ui">
+  <div class="widget">
+    <h4>Housing News</h4>
+    <div class="news-item"><span class="news-date">MAY 8</span><br>Move-out inspection schedules are now posted.</div>
+    <div class="news-item"><span class="news-date">MAY 5</span><br>Robinson Hall laundry facilities are now open.</div>
+    <div class="news-item"><span class="news-date">MAY 2</span><br>New filtered water stations installed in lobby.</div>
+  </div>
+  <div class="widget">
+    <h4>Relevant Contacts</h4>
+    <div class="contact-entry">
+      <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop" class="contact-img" alt="RA">
+      <div class="contact-info">
+        <h5>Jordan Smith</h5>
+        <div class="contact-role">Resident Assistant (RA)</div>
+        <a href="tel:3185550123" class="contact-phone">(318) 555-0123</a>
+      </div>
+    </div>
+    <div class="contact-entry">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop" class="contact-img" alt="AC">
+      <div class="contact-info">
+        <h5>Ms. Brenda Robinson</h5>
+        <div class="contact-role">Area Coordinator (AC)</div>
+        <a href="tel:3185550199" class="contact-phone">(318) 555-0199</a>
+      </div>
+    </div>
+    <div class="contact-entry">
+      <img src="https://images.unsplash.com/photo-1581578731522-42c262d4c062?w=100&h=100&fit=crop" class="contact-img" alt="Emergency">
+      <div class="contact-info">
+        <h5>Emergency Services</h5>
+        <div class="contact-role">GSU Police & Fire Response</div>
+        <a href="tel:3182742222" class="contact-phone">(318) 274-2222</a>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<script>
+const API = "https://gsufixit.pythonanywhere.com/api";
+const STUDENT_ID = "G00123456";
+const STUDENT_CREDS = { gnum: "G00123456", pass: "Tiger" };
+
+// ── HELPERS ──────────────────────────────────────────────────
+function toast(msg, duration = 3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function badgeClass(status) {
+  if (status === "Pending Review") return "badge badge-pending";
+  if (status === "In Progress")   return "badge badge-progress";
+  if (status === "Completed")     return "badge badge-done";
+  return "badge badge-cancel";
+}
+
+// ── APP ───────────────────────────────────────────────────────
+const app = {
+  activeCat: '',
+  pollTimer: null,
+
+  toStep1() {
+    document.getElementById('auth-1').classList.remove('hidden');
+    document.getElementById('auth-2').classList.add('hidden');
+  },
+
+  toStep2() {
+    document.getElementById('auth-1').classList.add('hidden');
+    document.getElementById('auth-2').classList.remove('hidden');
+  },
+
+  toStep3() {
+    const gnum = document.getElementById('login-gnum').value.trim();
+    const pass  = document.getElementById('login-pass').value.trim();
+
+    if (gnum === STUDENT_CREDS.gnum && pass === STUDENT_CREDS.pass) {
+      document.getElementById('auth-2').classList.add('hidden');
+      document.getElementById('auth-3').classList.remove('hidden');
+      setTimeout(() => {
+        document.getElementById('auth-3').classList.add('hidden');
+        document.getElementById('sidebar').classList.remove('hidden');
+        document.getElementById('main-ui').classList.remove('hidden');
+        document.getElementById('right-ui').classList.remove('hidden');
+        this.showPage('home');
+        this.startPolling();
+      }, 2200);
+    } else if (!gnum || !pass) {
+      alert("Please enter both your G-Number and Password.");
+    } else {
+      alert("Invalid G-Number or Password. Please try again.");
+    }
+  },
+
+  showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + id).classList.add('active');
+    const navId = (id === 'form') ? 'home' : id;
+    const navEl = document.getElementById('nav-' + navId);
+    if (navEl) navEl.classList.add('active');
+    if (id === 'active' || id === 'history') this.loadOrders();
+  },
+
+  openForm(cat, icon) {
+    this.activeCat = cat;
+    document.getElementById('form-title').textContent = icon + ' ' + cat + ' Order';
+    document.getElementById('form-subtitle').textContent = `Reporting a ${cat} maintenance issue.`;
+    this.showPage('form');
+  },
+
+  async submitTicket() {
+    const desc  = document.getElementById('req-desc').value.trim();
+    const dorm  = document.getElementById('req-dorm').value;
+    const room  = document.getElementById('req-room').value.trim();
+    const prio  = document.getElementById('req-prio').value;
+
+    if (!desc)  { alert("Please describe the issue."); return; }
+    if (!room)  { alert("Please enter your room number."); return; }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`${API}/submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category:     this.activeCat,
+          dorm_name:    dorm,
+          room_number:  room,
+          description:  desc,
+          priority:     prio,
+          submitted_by: STUDENT_ID,
+        })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        toast(`✅ Work order ${data.order_id} submitted!`);
+        document.getElementById('req-desc').value = '';
+        document.getElementById('req-room').value = '';
+        this.showPage('active');
+      } else {
+        alert("Error: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Could not reach server. Make sure fixit_backend.py is running.");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Submit Work Order';
+    }
+  },
+
+  async loadOrders() {
+    try {
+      const res = await fetch(`${API}/orders`);
+      const orders = await res.json();
+
+      // Filter to this student's orders
+      const mine = orders.filter(o => o.submitted_by === STUDENT_ID);
+      const active    = mine.filter(o => o.status !== "Completed" && o.status !== "Cancelled");
+      const completed = mine.filter(o => o.status === "Completed" || o.status === "Cancelled");
+
+      this.renderList('active-list', active, "No active work orders.");
+      this.renderList('history-list', completed, "No completed orders yet.");
+    } catch (err) {
+      // Server might not be running in preview mode — fail silently
+    }
+  },
+
+  renderList(id, orders, emptyMsg) {
+    const el = document.getElementById(id);
+    if (!orders.length) {
+      el.innerHTML = `<p style="padding:2rem;text-align:center;color:var(--text-light)">${emptyMsg}</p>`;
+      return;
+    }
+    el.innerHTML = orders.map(o => `
+      <div class="list-item">
+        <div>
+          <b style="color:var(--gsu-gold)">${o.category} — ${o.order_id}</b>
+          <span style="font-size:0.75rem;color:var(--text-light);margin-left:12px">${o.dorm_name}, Rm ${o.room_number}</span><br>
+          <small style="color:var(--text-light)">${o.description}</small><br>
+          <small style="color:var(--text-light)">Submitted: ${o.created_at} · Priority: ${o.priority}</small>
+        </div>
+        <span class="${badgeClass(o.status)}">${o.status}</span>
+      </div>
+    `).join('');
+  },
+
+  startPolling() {
+    // Refresh order status every 4 seconds
+    this.pollTimer = setInterval(() => this.loadOrders(), 4000);
+  }
+};
+</script>
+</body>
+</html>
