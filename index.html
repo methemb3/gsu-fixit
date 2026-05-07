@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSU FixIt — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gsu-gold: #FFB81C;
+    --gsu-red:  #C8102E;
+    --text-dark: #202124;
+    --text-light: #5F6368;
+    --border: #DADCE0;
+    --bg-alt: #F8F9FA;
+    --font-main: 'Product Sans', 'Lexend', sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font-main);
+    background: var(--bg-alt);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.75rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+
+  .logo-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+  .logo-title { font-size: 2rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 0.2rem; }
+  .logo-title span { color: var(--gsu-gold); }
+  .logo-sub { font-size: 0.85rem; color: var(--text-light); margin-bottom: 2rem; }
+
+  /* ── ROLE SELECTOR ── */
+  .role-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+  }
+  .role-btn {
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    background: white;
+    font-family: inherit;
+    transition: 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .role-btn:hover { border-color: var(--gsu-gold); background: #FFFBF0; }
+  .role-btn.selected { border-color: var(--gsu-gold); background: #FFFBF0; }
+  .role-btn .role-icon { font-size: 1.75rem; }
+  .role-btn .role-label { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); }
+  .role-btn .role-desc { font-size: 0.68rem; color: var(--text-light); }
+
+  /* ── FORM ── */
+  .form-section { display: none; text-align: left; }
+  .form-section.visible { display: block; }
+
+  .form-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-dark);
+    text-align: center;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 13px 16px;
+    margin: 6px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    background: var(--bg-alt);
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--gsu-gold); background: white; }
+
+  .inline-error {
+    font-size: 0.78rem;
+    color: var(--gsu-red);
+    margin: 4px 0 8px 2px;
+    display: none;
+    text-align: left;
+  }
+  .inline-error.show { display: block; }
+
+  .btn-gold {
+    width: 100%;
+    padding: 13px;
+    background: var(--gsu-gold);
+    color: var(--text-dark);
+    border: none;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.75rem;
+    transition: 0.2s;
+  }
+  .btn-gold:hover { background: #e5a519; transform: translateY(-1px); }
+  .btn-gold:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  .toggle-link {
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    text-align: center;
+  }
+  .toggle-link a {
+    color: var(--gsu-red);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .toggle-link a:hover { text-decoration: underline; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* mode label above inputs */
+  .mode-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo-icon">🐅</div>
+  <div class="logo-title">GSU <span>FixIt</span></div>
+  <div class="logo-sub">Grambling State University — Housing Maintenance</div>
+
+  <!-- ROLE SELECTOR -->
+  <div class="role-row">
+    <button class="role-btn" id="role-student" onclick="selectRole('student')">
+      <span class="role-icon">🎓</span>
+      <span class="role-label">Student</span>
+      <span class="role-desc">Resident Portal</span>
+    </button>
+    <button class="role-btn" id="role-admin" onclick="selectRole('admin')">
+      <span class="role-icon">🛠️</span>
+      <span class="role-label">Staff</span>
+      <span class="role-desc">Admin Dashboard</span>
+    </button>
+  </div>
+
+  <!-- STUDENT FORM -->
+  <div class="form-section" id="student-form">
+    <hr class="divider">
+    <div class="form-title" id="student-form-title">Student Sign In</div>
+
+    <!-- LOGIN MODE -->
+    <div id="student-login-mode">
+      <input type="text" id="s-gnum" class="form-input" placeholder="G-Number (e.g. G00123456)"
+             oninput="clearError('s-gnum-err')">
+      <div class="inline-error" id="s-gnum-err"></div>
+      <input type="password" id="s-pass" class="form-input" placeholder="Password"
+             onkeydown="if(event.key==='Enter')submitStudent()"
+             oninput="clearError('s-pass-err')">
+      <div class="inline-error" id="s-pass-err"></div>
+      <button class="btn-gold" id="s-login-btn" onclick="submitStudent()">Sign In →</button>
+      <div class="toggle-link">Don't have an account? <a onclick="setStudentMode('register')">Create one</a></div>
+    </div>
+
+    <!-- REGISTER MODE -->
+    <div id="student-register-mode" style="display:none">
+      <input type="text" id="r-gnum" class="form-input" placeholder="G-Number (e.g. G00123456)"
+             oninput="clearError('r-gnum-err')">
+      <div class="inline-error" id="r-gnum-err"></div>
+      <input type="password" id="r-pass" class="form-input" placeholder="Create password (min. 6 chars)"
+             onkeydown="if(event.key==='Enter')submitRegister()"
+             oninput="clearError('r-pass-err')">
+      <div class="inline-error" id="r-pass-err"></div>
+      <button class="btn-gold" id="r-register-btn" onclick="submitRegister()">Create Account →</button>
+      <div class="toggle-link">Already have an account? <a onclick="setStudentMode('login')">Sign in</a></div>
+    </div>
+  </div>
+
+  <!-- ADMIN FORM -->
+  <div class="form-section" id="admin-form">
+    <hr class="divider">
+    <div class="form-title">Staff Sign In</div>
+    <input type="text" id="a-user" class="form-input" placeholder="Username"
+           oninput="clearError('a-err')">
+    <input type="password" id="a-pass" class="form-input" placeholder="Password"
+           onkeydown="if(event.key==='Enter')submitAdmin()"
+           oninput="clearError('a-err')">
+    <div class="inline-error" id="a-err"></div>
+    <button class="btn-gold" id="a-login-btn" onclick="submitAdmin()">Sign In →</button>
+  </div>
+</div>
+
+<script>
+const API = "https://gsufixit.pythonanywhere.com/api";
+
+// ── Role selection ────────────────────────────────────────────
+function selectRole(role) {
+  document.getElementById('role-student').classList.toggle('selected', role === 'student');
+  document.getElementById('role-admin').classList.toggle('selected', role === 'admin');
+  document.getElementById('student-form').classList.toggle('visible', role === 'student');
+  document.getElementById('admin-form').classList.toggle('visible', role === 'admin');
+}
+
+// ── Student mode toggle (login ↔ register) ───────────────────
+function setStudentMode(mode) {
+  const isLogin = mode === 'login';
+  document.getElementById('student-login-mode').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('student-register-mode').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('student-form-title').textContent      = isLogin ? 'Student Sign In' : 'Create Account';
+  clearError('s-gnum-err'); clearError('s-pass-err');
+  clearError('r-gnum-err'); clearError('r-pass-err');
+}
+
+function clearError(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ''; el.classList.remove('show'); }
+}
+
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+
+// ── Validate G-number client-side ────────────────────────────
+function validateGnum(val, errId) {
+  const clean = val.trim().toUpperCase();
+  if (!clean) { showError(errId, 'G-Number is required.'); return null; }
+  if (!/^G00\d{6}$/.test(clean)) {
+    showError(errId, 'Must be G00 followed by exactly 6 digits (e.g. G00123456).');
+    return null;
+  }
+  return clean;
+}
+
+// ── Student login ─────────────────────────────────────────────
+async function submitStudent() {
+  const gnum = validateGnum(document.getElementById('s-gnum').value, 's-gnum-err');
+  if (!gnum) return;
+  const pass = document.getElementById('s-pass').value.trim();
+  if (!pass) { showError('s-pass-err', 'Password is required.'); return; }
+
+  const btn = document.getElementById('s-login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  try {
+    const res  = await fetch(`${API}/student/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ g_number: gnum, password: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('fixit_role',   'student');
+      sessionStorage.setItem('fixit_gnum',   data.g_number);
+      sessionStorage.setItem('fixit_authed', '1');
+      window.location.href = 'fixit_student.html';
+    } else {
+      const msg = data.error || 'Sign in failed.';
+      if (msg.toLowerCase().includes('password')) showError('s-pass-err', msg);
+      else showError('s-gnum-err', msg);
+    }
+  } catch {
+    showError('s-gnum-err', 'Cannot reach server. Check your connection.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+
+// ── Student register ──────────────────────────────────────────
+async function submitRegister() {
+  const gnum = validateGnum(document.getElementById('r-gnum').value, 'r-gnum-err');
+  if (!gnum) return;
+  const pass = document.getElementById('r-pass').value.trim();
+  if (!pass) { showError('r-pass-err', 'Password is required.'); return; }
+  if (pass.length < 6) { showError('r-pass-err', 'Password must be at least 6 characters.'); return; }
+
+  const btn = document.getElementById('r-register-btn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+
+  try {
+    const res  = await fetch(`${API}/student/register`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ g_number: gnum, password: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('fixit_role',   'student');
+      sessionStorage.setItem('fixit_gnum',   data.g_number);
+      sessionStorage.setItem('fixit_authed', '1');
+      window.location.href = 'fixit_student.html';
+    } else {
+      const msg = data.error || 'Registration failed.';
+      if (msg.toLowerCase().includes('password')) showError('r-pass-err', msg);
+      else showError('r-gnum-err', msg);
+    }
+  } catch {
+    showError('r-gnum-err', 'Cannot reach server. Check your connection.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Create Account →';
+  }
+}
+
+// ── Admin login ───────────────────────────────────────────────
+async function submitAdmin() {
+  const user = document.getElementById('a-user').value.trim();
+  const pass = document.getElementById('a-pass').value.trim();
+  if (!user || !pass) { showError('a-err', 'Username and password are required.'); return; }
+
+  const btn = document.getElementById('a-login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+
+  try {
+    const res  = await fetch(`${API}/admin/login`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('fixit_role',     'admin');
+      sessionStorage.setItem('fixit_username', user);
+      sessionStorage.setItem('fixit_authed',   '1');
+      window.location.href = 'fixit_admin.html';
+    } else {
+      showError('a-err', data.error || 'Invalid credentials.');
+    }
+  } catch {
+    showError('a-err', 'Cannot reach server. Check your connection.');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In →';
+  }
+}
+</script>
+</body>
+</html>
