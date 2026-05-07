@@ -11,63 +11,69 @@
     --gsu-red: #C8102E;
     --text-dark: #202124;
     --text-light: #5F6368;
-    --bg-main: #F8F9FA;
-    --bg-card: #FFFFFF;
+    --bg-main: #FFFFFF;
+    --bg-alt: #F8F9FA;
     --border: #DADCE0;
-    --font-main: 'Lexend', sans-serif;
+    --sidebar-width: 260px;
+    --font-main: 'Product Sans', 'Lexend', sans-serif;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: var(--font-main); background: var(--bg-main); color: var(--text-dark); min-height: 100vh; }
+  body { font-family: var(--font-main); background: var(--bg-alt); color: var(--text-dark); display: flex; min-height: 100vh; }
 
   /* ── AUTH ── */
   .auth-overlay { position: fixed; inset: 0; background: white; z-index: 5000; display: flex; align-items: center; justify-content: center; }
-  .auth-card { width: 100%; max-width: 400px; padding: 2.5rem; border: 1px solid var(--border); border-radius: 16px; background: white; }
+  .auth-card { width: 100%; max-width: 400px; text-align: center; padding: 2.5rem; border: 1px solid var(--border); border-radius: 16px; background: white; }
   .auth-card h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.25rem; }
   .auth-card p { color: var(--text-light); margin-bottom: 2rem; font-size: 0.9rem; }
-  .form-input { width: 100%; padding: 13px 16px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; outline: none; background: var(--bg-main); }
-  .form-input:focus { border-color: var(--gsu-red); background: white; }
-  .btn-red { background: var(--gsu-red); color: white; border: none; padding: 13px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 1rem; transition: 0.2s; font-family: inherit; }
-  .btn-red:hover { background: #a50d24; transform: translateY(-1px); }
+  .form-input { width: 100%; padding: 13px 16px; margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; outline: none; background: var(--bg-alt); }
+  .form-input:focus { border-color: var(--gsu-gold); background: white; }
+  .btn-gold { background: var(--gsu-gold); color: var(--text-dark); border: none; padding: 13px 28px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 1rem; transition: 0.2s; font-family: inherit; }
+  .btn-gold:hover { background: #e5a519; transform: translateY(-1px); }
   .error-msg { color: var(--gsu-red); font-size: 0.85rem; margin-top: 0.75rem; text-align: center; display: none; }
 
-  /* ── TOPBAR ── */
-  .topbar { background: white; border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  .topbar-logo { font-size: 1.4rem; font-weight: 800; }
-  .topbar-logo span { color: var(--gsu-gold); }
-  .topbar-logo em { color: var(--gsu-red); font-style: normal; font-size: 0.75rem; background: #FFF1F2; padding: 3px 10px; border-radius: 20px; margin-left: 10px; }
-  .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
-  .live-dot { width: 8px; height: 8px; border-radius: 50%; background: #34A853; display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .btn-logout { background: none; border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-family: inherit; font-size: 0.85rem; cursor: pointer; color: var(--text-light); transition: 0.2s; }
-  .btn-logout:hover { border-color: var(--gsu-red); color: var(--gsu-red); }
+  /* ── SIDEBAR ── */
+  .sidebar { width: var(--sidebar-width); height: 100vh; background: white; border-right: 1px solid var(--border); position: fixed; left: 0; top: 0; display: flex; flex-direction: column; padding: 2rem 1rem; z-index: 1000; }
+  .sidebar-logo { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.25rem; padding-left: 0.5rem; color: var(--text-dark); }
+  .sidebar-logo span { color: var(--gsu-gold); }
+  .sidebar-badge { display: inline-block; background: #FFF1F2; color: var(--gsu-red); font-size: 0.65rem; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-left: 8px; letter-spacing: 0.5px; text-transform: uppercase; vertical-align: middle; }
+  .sidebar-divider { height: 1px; background: var(--border); margin: 1.5rem 0.5rem; }
+  .nav-group { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .nav-item { padding: 12px 16px; border-radius: 8px; cursor: pointer; font-weight: 500; color: var(--text-light); display: flex; align-items: center; gap: 12px; transition: 0.2s; font-family: inherit; border: none; background: none; width: 100%; text-align: left; font-size: 1rem; }
+  .nav-item:hover { background: var(--bg-alt); color: var(--text-dark); }
+  .nav-item.active { color: var(--gsu-red); font-weight: 700; background: #FFF1F2; }
+  .live-indicator { display: flex; align-items: center; gap: 8px; padding: 10px 16px; font-size: 0.78rem; color: var(--text-light); margin-top: auto; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34A853; flex-shrink: 0; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* ── LAYOUT ── */
-  .dashboard { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+  /* ── MAIN ── */
+  .main-wrapper { margin-left: var(--sidebar-width); flex: 1; padding: 3rem; }
+  .page { display: none; }
+  .page.active { display: block; }
 
   /* ── STAT CARDS ── */
   .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
-  .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .stat-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
   .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-light); margin-bottom: 0.5rem; }
-  .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; }
+  .stat-value { font-size: 2.2rem; font-weight: 800; line-height: 1; }
   .stat-card.gold  .stat-value { color: var(--gsu-gold); }
+  .stat-card.red   .stat-value { color: var(--gsu-red); }
   .stat-card.blue  .stat-value { color: #1565C0; }
   .stat-card.green .stat-value { color: #2E7D32; }
-  .stat-card.red   .stat-value { color: var(--gsu-red); }
 
   /* ── FILTER BAR ── */
-  .filter-bar { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
-  .filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.85rem; background: var(--bg-main); outline: none; cursor: pointer; }
+  .filter-bar { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .filter-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 0.85rem; background: var(--bg-alt); outline: none; cursor: pointer; color: var(--text-dark); }
   .filter-select:focus { border-color: var(--gsu-gold); }
-  .filter-label { font-size: 0.75rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; }
 
   /* ── TABLE ── */
-  .table-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .table-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .table-header h3 { font-size: 1rem; font-weight: 700; }
-  
+
   table { width: 100%; border-collapse: collapse; }
-  thead th { padding: 12px 16px; text-align: left; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); border-bottom: 1px solid var(--border); background: var(--bg-main); }
+  thead th { padding: 12px 16px; text-align: left; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-light); border-bottom: 1px solid var(--border); background: var(--bg-alt); }
   tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #FAFAFA; }
@@ -85,7 +91,7 @@
   .status-pending  { border-color: #F9A825; color: #F57F17; background: #FFF8E1; }
   .status-progress { border-color: #1565C0; color: #1565C0; background: #E3F2FD; }
   .status-done     { border-color: #2E7D32; color: #2E7D32; background: #E8F5E9; }
-  .status-cancel   { border-color: #9E9E9E; color: #757575; background: #FAFAFA; }
+  .status-cancel   { border-color: #9E9E9E; color: #757575; background: #F5F5F5; }
 
   /* Empty state */
   .empty-state { padding: 4rem; text-align: center; color: var(--text-light); }
@@ -100,157 +106,166 @@
 </head>
 <body>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <!-- AUTH -->
 <div id="auth-overlay" class="auth-overlay">
   <div class="auth-card">
-    <div style="font-size: 2.5rem; margin-bottom: 1rem;">🛠️</div>
-    <h1>Admin Portal</h1>
-    <p>GSU FixIt — Maintenance Management</p>
+    <div style="font-size:2.5rem;margin-bottom:1rem">🛠️</div>
+    <h1>GSU FixIt</h1>
+    <p>Admin Portal — Maintenance Management</p>
     <input type="text" id="admin-user" class="form-input" placeholder="Username">
-    <input type="password" id="admin-pass" class="form-input" placeholder="Password" onkeydown="if(event.key==='Enter') admin.login()">
-    <button class="btn-red" onclick="admin.login()">Sign In →</button>
+    <input type="password" id="admin-pass" class="form-input" placeholder="Password" onkeydown="if(event.key==='Enter')admin.login()">
+    <button class="btn-gold" onclick="admin.login()">Sign In →</button>
     <div class="error-msg" id="auth-error">Invalid credentials. Please try again.</div>
   </div>
 </div>
 
-<!-- TOPBAR -->
-<header class="topbar hidden" id="topbar">
-  <div class="topbar-logo">
-    GSU <span>FixIt</span>
-    <em>Admin</em>
+<!-- SIDEBAR -->
+<aside class="sidebar hidden" id="sidebar">
+  <div style="padding-left:0.5rem;margin-bottom:2rem">
+    <div class="sidebar-logo">GSU <span>FixIt</span><span class="sidebar-badge">Admin</span></div>
   </div>
-  <div class="topbar-right">
-    <span style="font-size:0.85rem; color:var(--text-light)">
-      <span class="live-dot"></span>Live Updates
-    </span>
-    <button class="btn-logout" onclick="location.reload()">Logout</button>
+  <nav class="nav-group">
+    <button class="nav-item active" onclick="admin.showPage('orders')" id="nav-orders">📋 Work Orders</button>
+    <button class="nav-item" onclick="admin.showPage('stats')" id="nav-stats">📊 Statistics</button>
+  </nav>
+  <div class="sidebar-divider"></div>
+  <div class="live-indicator">
+    <span class="live-dot"></span> Live — updates every 3s
   </div>
-</header>
+  <button class="nav-item" onclick="location.reload()" style="color:var(--gsu-red);margin-bottom:0.5rem">← Logout</button>
+</aside>
 
-<!-- DASHBOARD -->
-<div class="dashboard hidden" id="dashboard">
+<!-- MAIN -->
+<div class="main-wrapper hidden" id="main-ui">
 
-  <!-- STAT CARDS -->
-  <div class="stats-row">
-    <div class="stat-card gold">
-      <div class="stat-label">Total Orders</div>
-      <div class="stat-value" id="stat-total">0</div>
+  <!-- PAGE: ORDERS -->
+  <section class="page active" id="page-orders">
+    <div style="margin-bottom:2.5rem">
+      <h1 style="font-size:2.2rem;letter-spacing:-0.5px">Work Orders</h1>
+      <p style="color:var(--text-light)">All incoming maintenance requests from student residents.</p>
     </div>
-    <div class="stat-card red">
-      <div class="stat-label">Pending Review</div>
-      <div class="stat-value" id="stat-pending">0</div>
-    </div>
-    <div class="stat-card blue">
-      <div class="stat-label">In Progress</div>
-      <div class="stat-value" id="stat-progress">0</div>
-    </div>
-    <div class="stat-card green">
-      <div class="stat-label">Completed</div>
-      <div class="stat-value" id="stat-done">0</div>
-    </div>
-  </div>
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar">
-    <span class="filter-label">Filter:</span>
-    <select class="filter-select" id="filter-status" onchange="admin.applyFilter()">
-      <option value="all">All Statuses</option>
-      <option value="Pending Review">Pending Review</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-      <option value="Cancelled">Cancelled</option>
-    </select>
-    <select class="filter-select" id="filter-cat" onchange="admin.applyFilter()">
-      <option value="all">All Categories</option>
-      <option>Plumbing</option>
-      <option>Electrical</option>
-      <option>HVAC / Air</option>
-      <option>Furniture</option>
-      <option>Appliances</option>
-      <option>Pest Control</option>
-    </select>
-    <select class="filter-select" id="filter-prio" onchange="admin.applyFilter()">
-      <option value="all">All Priorities</option>
-      <option value="Emergency">Emergency</option>
-      <option value="High">High</option>
-      <option value="Medium">Medium</option>
-      <option value="Low">Low</option>
-    </select>
-  </div>
-
-  <!-- TABLE -->
-  <div class="table-card">
-    <div class="table-header">
-      <h3>Work Orders</h3>
-      <span id="order-count" style="font-size:0.8rem;color:var(--text-light)">0 orders</span>
+    <div class="stats-row">
+      <div class="stat-card gold"><div class="stat-label">Total Orders</div><div class="stat-value" id="stat-total">0</div></div>
+      <div class="stat-card red"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending">0</div></div>
+      <div class="stat-card blue"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-value" id="stat-done">0</div></div>
     </div>
-    <div id="table-body">
-      <div class="empty-state">
-        <div class="big">📋</div>
-        <p>No work orders yet. Waiting for student submissions...</p>
+
+    <div class="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <select class="filter-select" id="filter-status" onchange="admin.applyFilter()">
+        <option value="all">All Statuses</option>
+        <option>Pending Review</option>
+        <option>In Progress</option>
+        <option>Completed</option>
+        <option>Cancelled</option>
+      </select>
+      <select class="filter-select" id="filter-cat" onchange="admin.applyFilter()">
+        <option value="all">All Categories</option>
+        <option>Plumbing</option>
+        <option>Electrical</option>
+        <option>HVAC / Air</option>
+        <option>Furniture</option>
+        <option>Appliances</option>
+        <option>Pest Control</option>
+      </select>
+      <select class="filter-select" id="filter-prio" onchange="admin.applyFilter()">
+        <option value="all">All Priorities</option>
+        <option value="Emergency">Emergency</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <h3>All Requests</h3>
+        <span id="order-count" style="font-size:0.8rem;color:var(--text-light)">0 orders</span>
+      </div>
+      <div id="table-body">
+        <div class="empty-state"><div class="big">📋</div><p>No work orders yet.</p></div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- PAGE: STATS -->
+  <section class="page" id="page-stats">
+    <div style="margin-bottom:2.5rem">
+      <h1 style="font-size:2.2rem;letter-spacing:-0.5px">Statistics</h1>
+      <p style="color:var(--text-light)">Overview of maintenance activity across all residence halls.</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card gold"><div class="stat-label">Total Orders</div><div class="stat-value" id="stat-total-2">0</div></div>
+      <div class="stat-card red"><div class="stat-label">Pending Review</div><div class="stat-value" id="stat-pending-2">0</div></div>
+      <div class="stat-card blue"><div class="stat-label">In Progress</div><div class="stat-value" id="stat-progress-2">0</div></div>
+      <div class="stat-card green"><div class="stat-label">Completed</div><div class="stat-value" id="stat-done-2">0</div></div>
+    </div>
+    <div class="table-card" style="margin-top:1.5rem">
+      <div class="table-header"><h3>Orders by Category</h3></div>
+      <div id="cat-breakdown"></div>
+    </div>
+  </section>
 
 </div>
 
 <script>
 const API = "https://gsufixit.pythonanywhere.com/api";
 let allOrders = [];
-let pollTimer = null;
 
-// ── HELPERS ──────────────────────────────────────────────────
-function toast(msg, duration = 3000) {
+function toast(msg, duration=3000) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), duration);
 }
 
 function prioClass(p) {
-  const map = { Low: 'chip-low', Medium: 'chip-medium', High: 'chip-high', Emergency: 'chip-emergency' };
-  return 'chip ' + (map[p] || 'chip-low');
+  return 'chip chip-'+(({Low:'low',Medium:'medium',High:'high',Emergency:'emergency'})[p]||'low');
 }
 
 function statusClass(s) {
-  if (s === "Pending Review") return "status-select status-pending";
-  if (s === "In Progress")   return "status-select status-progress";
-  if (s === "Completed")     return "status-select status-done";
+  if (s==="Pending Review") return "status-select status-pending";
+  if (s==="In Progress")   return "status-select status-progress";
+  if (s==="Completed")     return "status-select status-done";
   return "status-select status-cancel";
 }
 
-// ── ADMIN ─────────────────────────────────────────────────────
 const admin = {
-
   async login() {
     const user = document.getElementById('admin-user').value.trim();
     const pass = document.getElementById('admin-pass').value.trim();
     const errEl = document.getElementById('auth-error');
     errEl.style.display = 'none';
-
     try {
       const res = await fetch(`${API}/admin/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user, password: pass })
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({username:user, password:pass})
       });
       const data = await res.json();
       if (data.success) {
         document.getElementById('auth-overlay').classList.add('hidden');
-        document.getElementById('topbar').classList.remove('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
+        document.getElementById('sidebar').classList.remove('hidden');
+        document.getElementById('main-ui').classList.remove('hidden');
         this.loadOrders();
-        pollTimer = setInterval(() => this.loadOrders(), 3000);
+        setInterval(() => this.loadOrders(), 3000);
       } else {
+        errEl.textContent = data.error || "Invalid credentials. Please try again.";
         errEl.style.display = 'block';
       }
     } catch {
-      errEl.textContent = "Cannot reach server. Is fixit_backend.py running?";
+      errEl.textContent = "Cannot reach server. Check your connection.";
       errEl.style.display = 'block';
     }
+  },
+
+  showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    document.getElementById('nav-'+id).classList.add('active');
   },
 
   async loadOrders() {
@@ -259,50 +274,45 @@ const admin = {
       allOrders = await res.json();
       this.updateStats();
       this.applyFilter();
-    } catch { /* server offline */ }
+      this.updateCatBreakdown();
+    } catch {}
   },
 
   updateStats() {
-    const counts = { total: allOrders.length, pending: 0, progress: 0, done: 0 };
+    let pending=0, progress=0, done=0;
     allOrders.forEach(o => {
-      if (o.status === "Pending Review") counts.pending++;
-      if (o.status === "In Progress")   counts.progress++;
-      if (o.status === "Completed")     counts.done++;
+      if (o.status==="Pending Review") pending++;
+      if (o.status==="In Progress")   progress++;
+      if (o.status==="Completed")     done++;
     });
-    document.getElementById('stat-total').textContent    = counts.total;
-    document.getElementById('stat-pending').textContent  = counts.pending;
-    document.getElementById('stat-progress').textContent = counts.progress;
-    document.getElementById('stat-done').textContent     = counts.done;
+    const total = allOrders.length;
+    ['','2'].forEach(suffix => {
+      document.getElementById('stat-total'+suffix).textContent   = total;
+      document.getElementById('stat-pending'+suffix).textContent = pending;
+      document.getElementById('stat-progress'+suffix).textContent= progress;
+      document.getElementById('stat-done'+suffix).textContent    = done;
+    });
   },
 
   applyFilter() {
-    const statusF = document.getElementById('filter-status').value;
-    const catF    = document.getElementById('filter-cat').value;
-    const prioF   = document.getElementById('filter-prio').value;
-
-    let filtered = allOrders.filter(o => {
-      const matchStatus = statusF === 'all' || o.status === statusF;
-      const matchCat    = catF === 'all'    || o.category === catF;
-      const matchPrio   = prioF === 'all'   || o.priority === prioF;
-      return matchStatus && matchCat && matchPrio;
-    });
-
-    document.getElementById('order-count').textContent = `${filtered.length} order${filtered.length !== 1 ? 's' : ''}`;
+    const sf = document.getElementById('filter-status').value;
+    const cf = document.getElementById('filter-cat').value;
+    const pf = document.getElementById('filter-prio').value;
+    const filtered = allOrders.filter(o =>
+      (sf==='all'||o.status===sf) &&
+      (cf==='all'||o.category===cf) &&
+      (pf==='all'||o.priority===pf)
+    );
+    document.getElementById('order-count').textContent = `${filtered.length} order${filtered.length!==1?'s':''}`;
     this.renderTable(filtered);
   },
 
   renderTable(orders) {
     const container = document.getElementById('table-body');
-
     if (!orders.length) {
-      container.innerHTML = `
-        <div class="empty-state">
-          <div class="big">📋</div>
-          <p>No orders match the selected filters.</p>
-        </div>`;
+      container.innerHTML = `<div class="empty-state"><div class="big">📋</div><p>No orders match the selected filters.</p></div>`;
       return;
     }
-
     container.innerHTML = `
       <table>
         <thead>
@@ -312,14 +322,14 @@ const admin = {
             <th>Category</th>
             <th>Dorm</th>
             <th>Room</th>
-            <th>Student (G#)</th>
+            <th>Student G#</th>
             <th>Priority</th>
             <th>Description</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          ${orders.map(o => `
+          ${orders.map(o=>`
             <tr>
               <td><b style="color:var(--gsu-gold)">${o.order_id}</b></td>
               <td style="color:var(--text-light);font-size:0.8rem">${o.created_at}</td>
@@ -328,46 +338,51 @@ const admin = {
               <td>${o.room_number}</td>
               <td style="color:var(--text-light)">${o.submitted_by}</td>
               <td><span class="${prioClass(o.priority)}">${o.priority}</span></td>
-              <td style="max-width:220px;color:var(--text-light);font-size:0.82rem">${o.description}</td>
+              <td style="max-width:200px;color:var(--text-light);font-size:0.82rem">${o.description}</td>
               <td>
-                <select class="${statusClass(o.status)}" 
-                        onchange="admin.updateStatus('${o.order_id}', this)"
-                        data-id="${o.order_id}">
-                  <option ${o.status==='Pending Review' ?'selected':''}>Pending Review</option>
-                  <option ${o.status==='In Progress'   ?'selected':''}>In Progress</option>
-                  <option ${o.status==='Completed'     ?'selected':''}>Completed</option>
-                  <option ${o.status==='Cancelled'     ?'selected':''}>Cancelled</option>
+                <select class="${statusClass(o.status)}" onchange="admin.updateStatus('${o.order_id}',this)">
+                  <option ${o.status==='Pending Review'?'selected':''}>Pending Review</option>
+                  <option ${o.status==='In Progress'?'selected':''}>In Progress</option>
+                  <option ${o.status==='Completed'?'selected':''}>Completed</option>
+                  <option ${o.status==='Cancelled'?'selected':''}>Cancelled</option>
                 </select>
               </td>
-            </tr>
-          `).join('')}
+            </tr>`).join('')}
         </tbody>
       </table>`;
   },
 
+  updateCatBreakdown() {
+    const cats = {};
+    allOrders.forEach(o => { cats[o.category] = (cats[o.category]||0)+1; });
+    const el = document.getElementById('cat-breakdown');
+    if (!Object.keys(cats).length) {
+      el.innerHTML = `<div class="empty-state"><div class="big">📊</div><p>No data yet.</p></div>`;
+      return;
+    }
+    el.innerHTML = Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([cat,count])=>`
+      <div style="padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+        <span>${cat}</span>
+        <b style="color:var(--gsu-gold)">${count} order${count!==1?'s':''}</b>
+      </div>`).join('');
+  },
+
   async updateStatus(orderId, selectEl) {
     const newStatus = selectEl.value;
-
-    // Update class immediately for visual feedback
     selectEl.className = statusClass(newStatus);
-
     try {
       const res = await fetch(`${API}/orders/${orderId}/status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus })
+        method:"PATCH", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({status:newStatus})
       });
       const data = await res.json();
       if (data.success) {
         toast(`✅ ${orderId} → ${newStatus}`);
-        // Update local data so stats refresh correctly
-        const order = allOrders.find(o => o.order_id === orderId);
+        const order = allOrders.find(o=>o.order_id===orderId);
         if (order) order.status = newStatus;
         this.updateStats();
       }
-    } catch {
-      toast("⚠️ Could not update — server may be offline.");
-    }
+    } catch { toast("⚠️ Could not update — check your connection."); }
   }
 };
 </script>
