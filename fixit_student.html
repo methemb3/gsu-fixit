@@ -356,7 +356,7 @@ const app = {
       });
       const data = await res.json();
       if (data.success) {
-        toast(`✅ Work order ${data.order_id} submitted!`);
+        toast(`Work order ${data.order_id} submitted!`);
         document.getElementById('req-desc').value = '';
         document.getElementById('req-room').value = '';
         document.getElementById('req-dorm').value = 'Hunter Hall';
