@@ -252,9 +252,8 @@
 <script>
 const API = "https://gsufixit.pythonanywhere.com/api";
 
-// ─────────────────────────────────────────────────────────────
 //  UTILITIES
-// ─────────────────────────────────────────────────────────────
+
 function clearError(id) {
   const el = document.getElementById(id);
   if (el) { el.textContent = ''; el.classList.remove('show'); }
@@ -271,9 +270,8 @@ function clearLoginErrors() {
   document.getElementById('s-notfound-banner').classList.remove('show');
 }
 
-// ─────────────────────────────────────────────────────────────
 //  ROLE SELECTOR
-// ─────────────────────────────────────────────────────────────
+
 function selectRole(role) {
   document.getElementById('role-student').classList.toggle('selected', role === 'student');
   document.getElementById('role-admin').classList.toggle('selected', role === 'admin');
@@ -346,16 +344,6 @@ async function apiFetch(endpoint, body) {
   }
 }
 
-// ═════════════════════════════════════════════════════════════
-//  STUDENT LOGIN
-//
-//  Step 1: Validate G-number format client-side.
-//  Step 2: Send to server.
-//  Step 3a: 404 → G-number not in system → show "not found" banner.
-//           Do NOT log the user in. Do NOT create an account.
-//  Step 3b: 401 → wrong password → show "Incorrect password."
-//  Step 3c: 200 → success → redirect.
-// ═════════════════════════════════════════════════════════════
 async function doLogin() {
   clearLoginErrors();
 
@@ -403,15 +391,6 @@ async function doLogin() {
   btn.textContent = 'Sign In →';
 }
 
-// ═════════════════════════════════════════════════════════════
-//  STUDENT REGISTER
-//
-//  Step 1: Validate G-number format client-side.
-//  Step 2: Validate password length client-side.
-//  Step 3: Send to server.
-//  Step 4a: 409 → G-number already has an account → tell user to sign in.
-//  Step 4b: 201 → account created → redirect.
-// ═════════════════════════════════════════════════════════════
 async function doRegister() {
   clearError('r-gnum-err');
   clearError('r-pass-err');
@@ -458,9 +437,9 @@ async function doRegister() {
   btn.textContent = 'Create Account →';
 }
 
-// ═════════════════════════════════════════════════════════════
+
 //  ADMIN LOGIN  (completely unchanged from original)
-// ═════════════════════════════════════════════════════════════
+
 async function doAdminLogin() {
   clearError('a-err');
 
