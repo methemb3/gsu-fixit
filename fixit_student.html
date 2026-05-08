@@ -168,10 +168,10 @@
         <label>Residence Hall</label>
         <select id="req-dorm" class="form-area" onchange="app.toggleOtherDorm(this.value)">
           <option value="Hunter Hall">Hunter Hall</option>
-          <option value="Robinson Hall">Robinson Hall </option>
-          <option value="Garner Hall">Garner Hall</option>
-          <option value="Jewett Hall">Jewett Hall</option>
-          <option value="Adams Hall">Adams Hall</option>
+          <option value="Tiger Village A">Tiger Village A</option>
+          <option value="Tiger Village B">Tiger Village B</option>
+          <option value="Robinson Hall">Robinson Hall</option>
+          <option value="Favrot Hall">Favrot Hall</option>
           <option value="Other">Other (enter below)</option>
         </select>
       </div>
@@ -196,8 +196,7 @@
         <select id="req-prio" class="form-area">
           <option value="Low">Routine (3–5 Days)</option>
           <option value="Medium">Urgent (24 Hours)</option>
-          <option value="High">High Priority (1 hour)</option>
-          <option value="Emergency">Emergency (Immediate)</option>
+          <option value="High">High Priority (Same Day)</option>
         </select>
       </div>
       <button class="btn-gold" id="submit-btn" onclick="app.submitTicket()">Submit Work Order</button>
@@ -236,7 +235,8 @@
     <h2 style="margin-bottom:1.5rem">My Room Info</h2>
     <div class="form-box">
       <div class="form-group"><label>Student ID (G#)</label><input type="text" id="info-gnum" class="form-area" readonly style="background:var(--bg-alt)"></div>
-      <div class="form-group"><label>Residence Hall</label><input type="text" class="form-area" placeholder="Shown on your work orders" readonly style="background:var(--bg-alt)"></div>
+      <div class="form-group"><label>Residence Hall</label><input type="text" id="info-dorm" class="form-area" placeholder="Updates after your first work order submission" readonly style="background:var(--bg-alt)"></div>
+      <div class="form-group"><label>Room Number</label><input type="text" id="info-room" class="form-area" placeholder="Updates after your first work order submission" readonly style="background:var(--bg-alt)"></div>
     </div>
   </section>
 
@@ -318,6 +318,7 @@ const app = {
     if (nav) nav.classList.add('active');
     if (id==='active'||id==='history') this.loadOrders();
     if (id==='notifications') { this.loadNotifications(); this.markAllRead(); }
+    if (id==='room') this.loadRoomInfo();
   },
 
   toggleOtherDorm(val) {
@@ -356,11 +357,12 @@ const app = {
       });
       const data = await res.json();
       if (data.success) {
-        toast(`Work order ${data.order_id} submitted!`);
+        toast(`✅ Work order ${data.order_id} submitted!`);
         document.getElementById('req-desc').value = '';
         document.getElementById('req-room').value = '';
         document.getElementById('req-dorm').value = 'Hunter Hall';
         document.getElementById('other-dorm-group').classList.add('hidden');
+        this.loadRoomInfo();
         this.showPage('active');
         this.loadNotifications();
       } else { alert("Error: "+(data.error||"Unknown error")); }
@@ -414,6 +416,16 @@ const app = {
           </div>
           ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
         </div>`).join('');
+    } catch {}
+  },
+
+  async loadRoomInfo() {
+    if (!STUDENT_ID) return;
+    try {
+      const res  = await fetch(`${API}/student/room/${STUDENT_ID}`);
+      const data = await res.json();
+      document.getElementById('info-dorm').value = data.dorm_name   || '';
+      document.getElementById('info-room').value = data.room_number || '';
     } catch {}
   },
 
