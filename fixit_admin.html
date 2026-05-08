@@ -184,7 +184,7 @@
 const API = "https://gsufixit.pythonanywhere.com/api";
 let allOrders = [];
 
-// ── Session check ────────────────────────────────────────────────────────────
+// ── Session check 
 (function() {
   const authed = sessionStorage.getItem('fixit_authed');
   const role   = sessionStorage.getItem('fixit_role');
@@ -193,7 +193,7 @@ let allOrders = [];
   }
 })();
 
-// ── Toast helper ─────────────────────────────────────────────────────────────
+// ── Toast helper 
 function toast(msg, type='', duration=3000) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -201,7 +201,7 @@ function toast(msg, type='', duration=3000) {
   setTimeout(() => { t.className = 'toast'; }, duration);
 }
 
-// ── Style helpers ─────────────────────────────────────────────────────────────
+// ── Style helpers 
 function prioClass(p) {
   if (p==="Low")    return "chip chip-low";
   if (p==="Medium") return "chip chip-medium";
@@ -246,7 +246,7 @@ const admin = {
     document.getElementById('stat-done').textContent     = done;
   },
 
-  // ── NEW: Build dorm dropdown dynamically from order data ──────────────────
+  // ── NEW: Build dorm dropdown dynamically from order data 
   populateDormFilter() {
     const dorms = [...new Set(allOrders.map(o => o.dorm_name).filter(Boolean))].sort();
     const select = document.getElementById('filter-dorm');
@@ -261,7 +261,7 @@ const admin = {
     });
   },
 
-  // ── UPDATED: applyFilter now includes dorm filter ─────────────────────────
+  // ── UPDATED: applyFilter now includes dorm filter
   applyFilter() {
     const sf = document.getElementById('filter-status').value;
     const cf = document.getElementById('filter-cat').value;
@@ -337,16 +337,16 @@ const admin = {
         try { data = await res.json(); } catch {}
 
         if (data.success !== false) {
-          toast(`✅ ${orderId} → ${newStatus}`, 'success');
+          toast(` ${orderId} → ${newStatus}`, 'success');
           const order = allOrders.find(o => o.order_id === orderId);
           if (order) order.status = newStatus;
           this.updateStats();
           return;
         }
       }
-      toast(`⚠️ Could not update ${orderId}. Try again.`, 'error');
+      toast(`Could not update ${orderId}. Try again.`, 'error');
     } catch {
-      toast("⚠️ Could not update — check your connection.", 'error');
+      toast(" Could not update — check your connection.", 'error');
     }
   }
 };
