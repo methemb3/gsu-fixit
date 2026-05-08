@@ -283,8 +283,17 @@ async function submitStudent() {
       window.location.href = 'fixit_student.html';
     } else {
       const msg = data.error || 'Sign in failed.';
-      if (msg.toLowerCase().includes('password')) showError('s-pass-err', msg);
-      else showError('s-gnum-err', msg);
+      // Account doesn't exist → prompt to register and switch to register mode
+      if (res.status === 404 || msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('register')) {
+        showError('s-gnum-err', 'No account found for this G-Number. Please create one below.');
+        // Pre-fill the G-number in the register form and switch to it
+        document.getElementById('r-gnum').value = document.getElementById('s-gnum').value;
+        setTimeout(() => setStudentMode('register'), 1200);
+      } else if (msg.toLowerCase().includes('password') || res.status === 401) {
+        showError('s-pass-err', msg);
+      } else {
+        showError('s-gnum-err', msg);
+      }
     }
   } catch {
     showError('s-gnum-err', 'Cannot reach server. Check your connection.');
@@ -305,10 +314,18 @@ async function submitRegister() {
   btn.disabled = true; btn.textContent = 'Creating account…';
 
   try {
-    const res  = await fetch(`${API}/student/register`, {
+    const res = await fetch(`${API}/student/register`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ g_number: gnum, password: pass })
     });
+
+    // Guard against non-JSON responses (e.g. server asleep / 404 HTML page)
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+      showError('r-gnum-err', `Server error (HTTP ${res.status}). Try again in a moment — the server may be waking up.`);
+      return;
+    }
+
     const data = await res.json();
     if (data.success) {
       sessionStorage.setItem('fixit_role',   'student');
@@ -320,8 +337,10 @@ async function submitRegister() {
       if (msg.toLowerCase().includes('password')) showError('r-pass-err', msg);
       else showError('r-gnum-err', msg);
     }
-  } catch {
-    showError('r-gnum-err', 'Cannot reach server. Check your connection.');
+  } catch (err) {
+    // True network failure (no response at all)
+    showError('r-gnum-err', 'Cannot reach server. Check your connection and try again.');
+    console.error('[FixIt] Register fetch error:', err);
   } finally {
     btn.disabled = false; btn.textContent = 'Create Account →';
   }
