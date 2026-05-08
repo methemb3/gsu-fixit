@@ -13,7 +13,7 @@
     --text-light: #5F6368;
     --border: #DADCE0;
     --bg-alt: #F8F9FA;
-    --font-main: 'Product Sans', 'Lexend', sans-serif;
+    --font-main: 'Lexend', sans-serif;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -41,7 +41,6 @@
   .logo-title span { color: var(--gsu-gold); }
   .logo-sub { font-size: 0.85rem; color: var(--text-light); margin-bottom: 2rem; }
 
-  /* ── ROLE SELECTOR ── */
   .role-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -67,9 +66,9 @@
   .role-btn .role-label { font-size: 0.8rem; font-weight: 700; color: var(--text-dark); }
   .role-btn .role-desc { font-size: 0.68rem; color: var(--text-light); }
 
-  /* ── FORM ── */
   .form-section { display: none; text-align: left; }
   .form-section.visible { display: block; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
   .form-title {
     font-size: 1rem;
@@ -133,22 +132,27 @@
   }
   .toggle-link a:hover { text-decoration: underline; }
 
-  .divider {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 1.5rem 0;
+  /* Banner shown when login fails with "G-number not found" */
+  .info-banner {
+    display: none;
+    background: #FFF8E1;
+    border: 1px solid var(--gsu-gold);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+    color: var(--text-dark);
+    margin-top: 10px;
+    text-align: left;
+    line-height: 1.5;
   }
-
-  /* mode label above inputs */
-  .mode-label {
-    font-size: 0.68rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
-    display: block;
+  .info-banner.show { display: block; }
+  .info-banner a {
+    color: var(--gsu-red);
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
   }
+  .info-banner a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -172,73 +176,85 @@
     </button>
   </div>
 
-  <!-- STUDENT FORM -->
+  <!-- STUDENT PANEL -->
   <div class="form-section" id="student-form">
     <hr class="divider">
-    <div class="form-title" id="student-form-title">Student Sign In</div>
 
     <!-- LOGIN MODE -->
     <div id="student-login-mode">
-      <input type="text" id="s-gnum" class="form-input" placeholder="G-Number (e.g. G00123456)"
-             oninput="clearError('s-gnum-err')">
+      <div class="form-title">Student Sign In</div>
+
+      <input type="text" id="s-gnum" class="form-input"
+             placeholder="G-Number (e.g. G00123456)"
+             oninput="clearLoginErrors()">
       <div class="inline-error" id="s-gnum-err"></div>
-      <input type="password" id="s-pass" class="form-input" placeholder="Password"
-             onkeydown="if(event.key==='Enter')submitStudent()"
-             oninput="clearError('s-pass-err')">
+
+      <input type="password" id="s-pass" class="form-input"
+             placeholder="Password"
+             onkeydown="if(event.key==='Enter') doLogin()"
+             oninput="clearLoginErrors()">
       <div class="inline-error" id="s-pass-err"></div>
-      <button class="btn-gold" id="s-login-btn" onclick="submitStudent()">Sign In →</button>
-      <div class="toggle-link">Don't have an account? <a onclick="setStudentMode('register')">Create one</a></div>
+
+      <!-- Only appears when G-number is not found in the system -->
+      <div class="info-banner" id="s-notfound-banner">
+        This G-Number does not have an account yet.
+        <a onclick="goToRegister()">Create a new account here.</a>
+      </div>
+
+      <button class="btn-gold" id="s-login-btn" onclick="doLogin()">Sign In →</button>
+
+      <div class="toggle-link">
+        No account yet? <a onclick="goToRegister()">Create one here</a>
+      </div>
     </div>
 
     <!-- REGISTER MODE -->
     <div id="student-register-mode" style="display:none">
-      <input type="text" id="r-gnum" class="form-input" placeholder="G-Number (e.g. G00123456)"
+      <div class="form-title">Create Student Account</div>
+
+      <input type="text" id="r-gnum" class="form-input"
+             placeholder="G-Number (e.g. G00123456)"
              oninput="clearError('r-gnum-err')">
       <div class="inline-error" id="r-gnum-err"></div>
-      <input type="password" id="r-pass" class="form-input" placeholder="Create password (min. 6 chars)"
-             onkeydown="if(event.key==='Enter')submitRegister()"
+
+      <input type="password" id="r-pass" class="form-input"
+             placeholder="Create password (min. 6 characters)"
+             onkeydown="if(event.key==='Enter') doRegister()"
              oninput="clearError('r-pass-err')">
       <div class="inline-error" id="r-pass-err"></div>
-      <button class="btn-gold" id="r-register-btn" onclick="submitRegister()">Create Account →</button>
-      <div class="toggle-link">Already have an account? <a onclick="setStudentMode('login')">Sign in</a></div>
+
+      <button class="btn-gold" id="r-btn" onclick="doRegister()">Create Account →</button>
+
+      <div class="toggle-link">
+        Already have an account? <a onclick="goToLogin()">Sign in here</a>
+      </div>
     </div>
   </div>
 
-  <!-- ADMIN FORM -->
+  <!-- ADMIN PANEL (completely unchanged) -->
   <div class="form-section" id="admin-form">
     <hr class="divider">
     <div class="form-title">Staff Sign In</div>
-    <input type="text" id="a-user" class="form-input" placeholder="Username"
+
+    <input type="text" id="a-user" class="form-input"
+           placeholder="Username"
            oninput="clearError('a-err')">
-    <input type="password" id="a-pass" class="form-input" placeholder="Password"
-           onkeydown="if(event.key==='Enter')submitAdmin()"
+    <input type="password" id="a-pass" class="form-input"
+           placeholder="Password"
+           onkeydown="if(event.key==='Enter') doAdminLogin()"
            oninput="clearError('a-err')">
     <div class="inline-error" id="a-err"></div>
-    <button class="btn-gold" id="a-login-btn" onclick="submitAdmin()">Sign In →</button>
+
+    <button class="btn-gold" id="a-btn" onclick="doAdminLogin()">Sign In →</button>
   </div>
 </div>
 
 <script>
 const API = "https://gsufixit.pythonanywhere.com/api";
 
-// ── Role selection ────────────────────────────────────────────
-function selectRole(role) {
-  document.getElementById('role-student').classList.toggle('selected', role === 'student');
-  document.getElementById('role-admin').classList.toggle('selected', role === 'admin');
-  document.getElementById('student-form').classList.toggle('visible', role === 'student');
-  document.getElementById('admin-form').classList.toggle('visible', role === 'admin');
-}
-
-// ── Student mode toggle (login ↔ register) ───────────────────
-function setStudentMode(mode) {
-  const isLogin = mode === 'login';
-  document.getElementById('student-login-mode').style.display    = isLogin ? 'block' : 'none';
-  document.getElementById('student-register-mode').style.display = isLogin ? 'none'  : 'block';
-  document.getElementById('student-form-title').textContent      = isLogin ? 'Student Sign In' : 'Create Account';
-  clearError('s-gnum-err'); clearError('s-pass-err');
-  clearError('r-gnum-err'); clearError('r-pass-err');
-}
-
+// ─────────────────────────────────────────────────────────────
+//  UTILITIES
+// ─────────────────────────────────────────────────────────────
 function clearError(id) {
   const el = document.getElementById(id);
   if (el) { el.textContent = ''; el.classList.remove('show'); }
@@ -249,131 +265,232 @@ function showError(id, msg) {
   if (el) { el.textContent = msg; el.classList.add('show'); }
 }
 
-// ── Validate G-number client-side ────────────────────────────
-function validateGnum(val, errId) {
-  const clean = val.trim().toUpperCase();
-  if (!clean) { showError(errId, 'G-Number is required.'); return null; }
-  if (!/^G00\d{6}$/.test(clean)) {
-    showError(errId, 'Must be G00 followed by exactly 6 digits (e.g. G00123456).');
-    return null;
-  }
-  return clean;
+function clearLoginErrors() {
+  clearError('s-gnum-err');
+  clearError('s-pass-err');
+  document.getElementById('s-notfound-banner').classList.remove('show');
 }
 
-// ── Student login ─────────────────────────────────────────────
-async function submitStudent() {
+// ─────────────────────────────────────────────────────────────
+//  ROLE SELECTOR
+// ─────────────────────────────────────────────────────────────
+function selectRole(role) {
+  document.getElementById('role-student').classList.toggle('selected', role === 'student');
+  document.getElementById('role-admin').classList.toggle('selected', role === 'admin');
+  document.getElementById('student-form').classList.toggle('visible', role === 'student');
+  document.getElementById('admin-form').classList.toggle('visible', role === 'admin');
+}
+
+// ─────────────────────────────────────────────────────────────
+//  VIEW SWITCHING: login ↔ register
+// ─────────────────────────────────────────────────────────────
+function goToRegister() {
+  // Pre-fill G-number if the user already typed one in the login form
+  const typed = document.getElementById('s-gnum').value.trim();
+  if (typed) document.getElementById('r-gnum').value = typed;
+
+  document.getElementById('student-login-mode').style.display    = 'none';
+  document.getElementById('student-register-mode').style.display = 'block';
+  clearError('r-gnum-err');
+  clearError('r-pass-err');
+}
+
+function goToLogin() {
+  document.getElementById('student-login-mode').style.display    = 'block';
+  document.getElementById('student-register-mode').style.display = 'none';
+  clearLoginErrors();
+}
+
+// ─────────────────────────────────────────────────────────────
+//  G-NUMBER FORMAT VALIDATOR
+//  Rule: capital G + "00" + exactly 6 digits  →  G00######
+// ─────────────────────────────────────────────────────────────
+function validateGnum(raw, errId) {
+  const val = raw.trim().toUpperCase();
+  if (!val) {
+    showError(errId, 'G-Number is required.');
+    return null;
+  }
+  if (!/^G00\d{6}$/.test(val)) {
+    showError(errId, 'Invalid G-Number format (e.g. G00123456).');
+    return null;
+  }
+  return val;
+}
+
+// ─────────────────────────────────────────────────────────────
+//  SAFE FETCH WRAPPER
+//  Always returns { ok, status, data, serverDown }
+//  Never throws — catches both network errors and bad JSON.
+// ─────────────────────────────────────────────────────────────
+async function apiFetch(endpoint, body) {
+  try {
+    const res = await fetch(`${API}${endpoint}`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(body),
+    });
+
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      // Server is asleep or returned an HTML error page
+      return { ok: false, status: res.status, data: null, serverDown: true };
+    }
+
+    const data = await res.json();
+    return { ok: res.ok, status: res.status, data, serverDown: false };
+
+  } catch {
+    // True network failure — no response at all
+    return { ok: false, status: 0, data: null, serverDown: true };
+  }
+}
+
+// ═════════════════════════════════════════════════════════════
+//  STUDENT LOGIN
+//
+//  Step 1: Validate G-number format client-side.
+//  Step 2: Send to server.
+//  Step 3a: 404 → G-number not in system → show "not found" banner.
+//           Do NOT log the user in. Do NOT create an account.
+//  Step 3b: 401 → wrong password → show "Incorrect password."
+//  Step 3c: 200 → success → redirect.
+// ═════════════════════════════════════════════════════════════
+async function doLogin() {
+  clearLoginErrors();
+
   const gnum = validateGnum(document.getElementById('s-gnum').value, 's-gnum-err');
   if (!gnum) return;
+
   const pass = document.getElementById('s-pass').value.trim();
   if (!pass) { showError('s-pass-err', 'Password is required.'); return; }
 
   const btn = document.getElementById('s-login-btn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
 
-  try {
-    const res  = await fetch(`${API}/student/login`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ g_number: gnum, password: pass })
-    });
-    const data = await res.json();
-    if (data.success) {
-      sessionStorage.setItem('fixit_role',   'student');
-      sessionStorage.setItem('fixit_gnum',   data.g_number);
-      sessionStorage.setItem('fixit_authed', '1');
-      window.location.href = 'fixit_student.html';
-    } else {
-      const msg = data.error || 'Sign in failed.';
-      // Account doesn't exist → prompt to register and switch to register mode
-      if (res.status === 404 || msg.toLowerCase().includes('not found') || msg.toLowerCase().includes('register')) {
-        showError('s-gnum-err', 'No account found for this G-Number. Please create one below.');
-        // Pre-fill the G-number in the register form and switch to it
-        document.getElementById('r-gnum').value = document.getElementById('s-gnum').value;
-        setTimeout(() => setStudentMode('register'), 1200);
-      } else if (msg.toLowerCase().includes('password') || res.status === 401) {
-        showError('s-pass-err', msg);
-      } else {
-        showError('s-gnum-err', msg);
-      }
-    }
-  } catch {
-    showError('s-gnum-err', 'Cannot reach server. Check your connection.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Sign In →';
+  const { ok, status, data, serverDown } = await apiFetch('/student/login', {
+    g_number: gnum,
+    password: pass,
+  });
+
+  if (serverDown) {
+    // Network/server issue — not a credential problem
+    showError('s-gnum-err', 'Cannot reach server. Please try again in a moment.');
+
+  } else if (ok && data.success) {
+    // ✅ Correct G-number + correct password → log in
+    sessionStorage.setItem('fixit_role',   'student');
+    sessionStorage.setItem('fixit_gnum',   data.g_number);
+    sessionStorage.setItem('fixit_authed', '1');
+    window.location.href = 'fixit_student.html';
+    return; // skip re-enabling button during redirect
+
+  } else if (status === 404) {
+    // ❌ G-number not found → prompt to create account, do NOT log in
+    document.getElementById('s-notfound-banner').classList.add('show');
+
+  } else if (status === 401) {
+    // ❌ G-number exists but password is wrong
+    showError('s-pass-err', 'Incorrect password.');
+
+  } else {
+    // Any other server error
+    showError('s-gnum-err', data?.error || 'Sign in failed. Please try again.');
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In →';
 }
 
-// ── Student register ──────────────────────────────────────────
-async function submitRegister() {
+// ═════════════════════════════════════════════════════════════
+//  STUDENT REGISTER
+//
+//  Step 1: Validate G-number format client-side.
+//  Step 2: Validate password length client-side.
+//  Step 3: Send to server.
+//  Step 4a: 409 → G-number already has an account → tell user to sign in.
+//  Step 4b: 201 → account created → redirect.
+// ═════════════════════════════════════════════════════════════
+async function doRegister() {
+  clearError('r-gnum-err');
+  clearError('r-pass-err');
+
   const gnum = validateGnum(document.getElementById('r-gnum').value, 'r-gnum-err');
   if (!gnum) return;
+
   const pass = document.getElementById('r-pass').value.trim();
   if (!pass) { showError('r-pass-err', 'Password is required.'); return; }
   if (pass.length < 6) { showError('r-pass-err', 'Password must be at least 6 characters.'); return; }
 
-  const btn = document.getElementById('r-register-btn');
-  btn.disabled = true; btn.textContent = 'Creating account…';
+  const btn = document.getElementById('r-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
 
-  try {
-    const res = await fetch(`${API}/student/register`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ g_number: gnum, password: pass })
-    });
+  const { ok, status, data, serverDown } = await apiFetch('/student/register', {
+    g_number: gnum,
+    password: pass,
+  });
 
-    // Guard against non-JSON responses (e.g. server asleep / 404 HTML page)
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      showError('r-gnum-err', `Server error (HTTP ${res.status}). Try again in a moment — the server may be waking up.`);
-      return;
-    }
+  if (serverDown) {
+    showError('r-gnum-err', 'Cannot reach server. Please try again in a moment.');
 
-    const data = await res.json();
-    if (data.success) {
-      sessionStorage.setItem('fixit_role',   'student');
-      sessionStorage.setItem('fixit_gnum',   data.g_number);
-      sessionStorage.setItem('fixit_authed', '1');
-      window.location.href = 'fixit_student.html';
-    } else {
-      const msg = data.error || 'Registration failed.';
-      if (msg.toLowerCase().includes('password')) showError('r-pass-err', msg);
-      else showError('r-gnum-err', msg);
-    }
-  } catch (err) {
-    // True network failure (no response at all)
-    showError('r-gnum-err', 'Cannot reach server. Check your connection and try again.');
-    console.error('[FixIt] Register fetch error:', err);
-  } finally {
-    btn.disabled = false; btn.textContent = 'Create Account →';
+  } else if (ok && data.success) {
+    // ✅ Account created → redirect
+    sessionStorage.setItem('fixit_role',   'student');
+    sessionStorage.setItem('fixit_gnum',   data.g_number);
+    sessionStorage.setItem('fixit_authed', '1');
+    window.location.href = 'fixit_student.html';
+    return;
+
+  } else if (status === 409) {
+    // ❌ G-number already registered
+    showError('r-gnum-err', 'An account with this G-Number already exists. Please sign in instead.');
+
+  } else if (data?.error?.toLowerCase().includes('password')) {
+    showError('r-pass-err', data.error);
+
+  } else {
+    showError('r-gnum-err', data?.error || 'Registration failed. Please try again.');
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Create Account →';
 }
 
-// ── Admin login ───────────────────────────────────────────────
-async function submitAdmin() {
+// ═════════════════════════════════════════════════════════════
+//  ADMIN LOGIN  (completely unchanged from original)
+// ═════════════════════════════════════════════════════════════
+async function doAdminLogin() {
+  clearError('a-err');
+
   const user = document.getElementById('a-user').value.trim();
   const pass = document.getElementById('a-pass').value.trim();
   if (!user || !pass) { showError('a-err', 'Username and password are required.'); return; }
 
-  const btn = document.getElementById('a-login-btn');
-  btn.disabled = true; btn.textContent = 'Signing in…';
+  const btn = document.getElementById('a-btn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in…';
 
-  try {
-    const res  = await fetch(`${API}/admin/login`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user, password: pass })
-    });
-    const data = await res.json();
-    if (data.success) {
-      sessionStorage.setItem('fixit_role',     'admin');
-      sessionStorage.setItem('fixit_username', user);
-      sessionStorage.setItem('fixit_authed',   '1');
-      window.location.href = 'fixit_admin.html';
-    } else {
-      showError('a-err', data.error || 'Invalid credentials.');
-    }
-  } catch {
-    showError('a-err', 'Cannot reach server. Check your connection.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Sign In →';
+  const { ok, data, serverDown } = await apiFetch('/admin/login', {
+    username: user,
+    password: pass,
+  });
+
+  if (serverDown) {
+    showError('a-err', 'Cannot reach server. Please try again in a moment.');
+  } else if (ok && data.success) {
+    sessionStorage.setItem('fixit_role',     'admin');
+    sessionStorage.setItem('fixit_username', user);
+    sessionStorage.setItem('fixit_authed',   '1');
+    window.location.href = 'fixit_admin.html';
+    return;
+  } else {
+    showError('a-err', data?.error || 'Invalid credentials.');
   }
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In →';
 }
 </script>
 </body>
