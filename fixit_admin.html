@@ -161,6 +161,10 @@
       <option value="Medium">Medium</option>
       <option value="High">High</option>
     </select>
+    <!-- ── NEW: Filter by Dorm ── -->
+    <select class="filter-select" id="filter-dorm" onchange="admin.applyFilter()">
+      <option value="all">All Dorms</option>
+    </select>
   </div>
 
   <!-- TABLE -->
@@ -219,13 +223,13 @@ const admin = {
     window.location.href = 'index.html';
   },
 
-  // FIX (Change 2): loadOrders populates allOrders THEN calls applyFilter
   async loadOrders() {
     try {
       const res = await fetch(`${API}/orders`);
       allOrders = await res.json();
       this.updateStats();
-      this.applyFilter();          // only called after allOrders is populated
+      this.populateDormFilter();   // ← NEW: populate dorm dropdown from real data
+      this.applyFilter();
     } catch {}
   },
 
@@ -242,15 +246,32 @@ const admin = {
     document.getElementById('stat-done').textContent     = done;
   },
 
-  // FIX (Change 2): filter dropdowns default to "all", table renders immediately
+  // ── NEW: Build dorm dropdown dynamically from order data ──────────────────
+  populateDormFilter() {
+    const dorms = [...new Set(allOrders.map(o => o.dorm_name).filter(Boolean))].sort();
+    const select = document.getElementById('filter-dorm');
+    const current = select.value;  // preserve current selection across polls
+    select.innerHTML = '<option value="all">All Dorms</option>';
+    dorms.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = d;
+      if (d === current) opt.selected = true;
+      select.appendChild(opt);
+    });
+  },
+
+  // ── UPDATED: applyFilter now includes dorm filter ─────────────────────────
   applyFilter() {
-    const sf = document.getElementById('filter-status').value;  // defaults to "all"
+    const sf = document.getElementById('filter-status').value;
     const cf = document.getElementById('filter-cat').value;
     const pf = document.getElementById('filter-prio').value;
+    const df = document.getElementById('filter-dorm').value;   // ← NEW
     const filtered = allOrders.filter(o =>
       (sf==='all' || o.status===sf) &&
       (cf==='all' || o.category===cf) &&
-      (pf==='all' || o.priority===pf)
+      (pf==='all' || o.priority===pf) &&
+      (df==='all' || o.dorm_name===df)   // ← NEW
     );
     document.getElementById('order-count').textContent = `${filtered.length} order${filtered.length!==1?'s':''}`;
     this.renderTable(filtered);
@@ -301,7 +322,6 @@ const admin = {
       </table>`;
   },
 
-  // FIX (Change 3): separate JSON parse from fetch, treat 200/204 as success
   async updateStatus(orderId, selectEl) {
     const newStatus = selectEl.value;
     selectEl.className = statusClass(newStatus);
@@ -312,9 +332,7 @@ const admin = {
         body: JSON.stringify({ status: newStatus })
       });
 
-      // Treat any 2xx response as success — don't rely solely on JSON body
       if (res.ok) {
-        // Try to parse JSON, but don't fail if body is empty
         let data = { success: true };
         try { data = await res.json(); } catch {}
 
