@@ -84,7 +84,6 @@
   .chip-low       { background: #E8F5E9; color: #2E7D32; }
   .chip-medium    { background: #FFF8E1; color: #F57F17; }
   .chip-high      { background: #FBE9E7; color: #BF360C; }
-  .chip-emergency { background: #FCE4EC; color: #880E4F; }
 
   /* Status dropdown */
   .status-select { padding: 6px 10px; border-radius: 6px; font-family: inherit; font-size: 0.78rem; font-weight: 700; border: 1.5px solid; cursor: pointer; outline: none; transition: 0.2s; }
@@ -161,7 +160,6 @@
       <option value="Low">Low</option>
       <option value="Medium">Medium</option>
       <option value="High">High</option>
-      <option value="Emergency">Emergency</option>
     </select>
   </div>
 
@@ -201,10 +199,9 @@ function toast(msg, type='', duration=3000) {
 
 // ── Style helpers ─────────────────────────────────────────────────────────────
 function prioClass(p) {
-  if (p==="Low")       return "chip chip-low";
-  if (p==="Medium")    return "chip chip-medium";
-  if (p==="High")      return "chip chip-high";
-  if (p==="Emergency") return "chip chip-emergency";
+  if (p==="Low")    return "chip chip-low";
+  if (p==="Medium") return "chip chip-medium";
+  if (p==="High")   return "chip chip-high";
   return "chip chip-low";
 }
 
