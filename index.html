@@ -315,12 +315,11 @@ function validateGnum(raw, errId) {
   }
   return val;
 }
-
-// ─────────────────────────────────────────────────────────────
+  
 //  SAFE FETCH WRAPPER
 //  Always returns { ok, status, data, serverDown }
 //  Never throws — catches both network errors and bad JSON.
-// ─────────────────────────────────────────────────────────────
+
 async function apiFetch(endpoint, body) {
   try {
     const res = await fetch(`${API}${endpoint}`, {
@@ -367,7 +366,7 @@ async function doLogin() {
     showError('s-gnum-err', 'Cannot reach server. Please try again in a moment.');
 
   } else if (ok && data.success) {
-    // ✅ Correct G-number + correct password → log in
+    // Correct G-number + correct password → log in
     sessionStorage.setItem('fixit_role',   'student');
     sessionStorage.setItem('fixit_gnum',   data.g_number);
     sessionStorage.setItem('fixit_authed', '1');
@@ -375,11 +374,11 @@ async function doLogin() {
     return; // skip re-enabling button during redirect
 
   } else if (status === 404) {
-    // ❌ G-number not found → prompt to create account, do NOT log in
+    // G-number not found → prompt to create account, do NOT log in
     document.getElementById('s-notfound-banner').classList.add('show');
 
   } else if (status === 401) {
-    // ❌ G-number exists but password is wrong
+    // G-number exists but password is wrong
     showError('s-pass-err', 'Incorrect password.');
 
   } else {
