@@ -381,7 +381,20 @@ const app = {
     } catch {}
   },
 
- 
+  renderList(id, orders, emptyMsg) {
+    const el = document.getElementById(id);
+    if (!orders.length) { el.innerHTML=`<p style="padding:2rem;text-align:center;color:var(--text-light)">${emptyMsg}</p>`; return; }
+    el.innerHTML = orders.map(o=>`
+      <div class="list-item">
+        <div>
+          <b style="color:var(--gsu-gold)">${o.category} — ${o.order_id}</b>
+          <span style="font-size:0.75rem;color:var(--text-light);margin-left:10px">${o.dorm_name}, Rm ${o.room_number}</span><br>
+          <small style="color:var(--text-light)">${o.description}</small><br>
+          <small style="color:var(--text-light)">Submitted: ${o.created_at} · Priority: ${o.priority}</small>
+        </div>
+        <span class="${badgeClass(o.status)}">${o.status}</span>
+      </div>`).join('');
+  },
 
   async loadNotifications() {
     if (!STUDENT_ID) return;
